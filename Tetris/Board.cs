@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -71,7 +72,9 @@ namespace Tetris
         public bool moveRight(Block b)
         {
             Erase(b);
-            for (int i = 0; i < b.Shape.Length; i++)
+
+
+            /*for (int i = 0; i < b.Shape.Length; i++)
             {
                 if (!inBound((int)(b.Shape[i].Y + b.Coordinates.Y),
                         (int)(b.Shape[i].X + b.Coordinates.X) + 1) ||
@@ -81,9 +84,10 @@ namespace Tetris
                     Draw(b);
                     return false;
                 }
-            }
+            }*/
 
             b.Coordinates = new Point(b.Coordinates.X + 1, b.Coordinates.Y);
+            adjustBlock(b);
             Draw(b);
 
             return true;
@@ -169,9 +173,76 @@ namespace Tetris
             return true;
         }
 
-        public void rotateBlock(Block _block)
+        public bool rotateBlock(Block _block)
         {
-            throw new NotImplementedException();
+            Erase(_block);
+
+            _block.Rotate();
+            adjustBlock(_block);
+            Draw(_block);
+            return true;
+        }
+
+        private void adjustBlock(Block _block)
+        {
+            Erase(_block);
+            int minL = 0;
+            int maxR = 0;
+            for (int i = 0; i < _block.Shape.Length; i++)
+            {
+                if(_block.Shape[i].X+_block.Coordinates.X<minL)
+                {
+                    minL = (int)_block.Shape[i].X + (int)_block.Coordinates.X;
+                    if (minL != 0)
+                        Debug.WriteLine("Block is off by " + minL + " to the left");
+                }
+
+                if(_block.Shape[i].X+_block.Coordinates.X>=(maxR+_width))
+                {
+                    maxR = (int)_block.Shape[i].X + (int)_block.Coordinates.X - _width + 1;
+                    Debug.WriteLine("maxR is " + maxR);
+                    if (maxR != 0)
+                        Debug.WriteLine("Block is off by " + maxR + " to the right");
+                }
+            }
+            _block.Coordinates = new Point(_block.Coordinates.X-minL-maxR, _block.Coordinates.Y);
+            Draw(_block);
+        }
+
+        public int checkLines()
+        {
+            bool[] lines = new bool[_height];
+            int numCompleted = 0;
+            for(int r=_height-1; r >= 0; r-- )
+            {
+                lines[r] = true;
+                for(int c=0; c<_width; c++)
+                    if (!isOccupied(r, c))
+                        lines[r] = false;
+            }
+            for (int i = 0; i < lines.Length; i++)
+                if (lines[i])
+                {
+                    numCompleted++;
+                    resetLine(i);
+                }
+            return numCompleted;
+        }
+
+        protected void resetLine(int row)
+        {
+            for (int c = 0; c < _width; c++)
+                _cells[row, c].Fill = _background;
+
+            Debug.WriteLine("Resetting line {0}", row);
+            for(int r = row - 1; r >= 0; r --)
+                for(int c = 0; c < _width; c ++)
+                {
+                    _occupied[r + 1, c] = _occupied[r, c];
+                    _cells[r + 1, c].Fill = _cells[r, c].Fill;
+                    _cells[r, c].Fill = _background;
+                    _occupied[r, c] = false;
+                }
         }
     }
 }

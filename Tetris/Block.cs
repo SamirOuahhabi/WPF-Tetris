@@ -18,9 +18,10 @@ namespace Tetris
         public static SolidColorBrush SSKEW = Brushes.LightGreen;
         public static SolidColorBrush ZSKEW = Brushes.Red;
 
-        protected Point[] _shape;
+        protected Point[][] _shape;
         protected Point _coordinates;
         protected SolidColorBrush _color;
+        protected int _rotation;
 
         public Block()
         {
@@ -34,81 +35,235 @@ namespace Tetris
             switch (rand.Next() % 7)
             {
                 case 0: //T
-                    _color = Block.TEE;
-                    _shape = new Point[]{
-                        new Point(0,0),
-                        new Point(-1,0),
-                        new Point(0,-1),
-                        new Point(1,0),
-                    };
+                    generateT();
                     break;
 
                 case 1: //L
-                    _color = Block.EL;
-                    _shape = new Point[]{
-                        new Point(0,0),
-                        new Point(0,-1),
-                        new Point(0,1),
-                        new Point(1,1),
-                    };
+                    generateL();
                     break;
 
                 case 2: // _
-                    _color = Block.LINE;
-                    _shape = new Point[]{
-                        new Point(0,0),
-                        new Point(-1,0),
-                        new Point(1,0),
-                        new Point(2,0),
-                    };
+                    generateLine();
                     break;
 
                 case 3: // J
-                    _color = Block.JAY;
-                    _shape = new Point[]{
-                        new Point(0,0),
-                        new Point(0,-1),
-                        new Point(0,1),
-                        new Point(-1,1),
-                    };
+                    generateJ();
                     break;
 
 
                 case 4: // Z
-                    _color = Block.ZSKEW;
-                    _shape = new Point[]{
-                        new Point(0,0),
-                        new Point(-1,0),
-                        new Point(0,1),
-                        new Point(1,1),
-                    };
+                    generateZ();
                     break;
 
 
                 case 5: // S
-                    _color = Block.SSKEW;
-                    _shape = new Point[]{
-                        new Point(0,0),
-                        new Point(1,0),
-                        new Point(0,1),
-                        new Point(-1,1),
-                    };
+                    generateS();
                     break;
 
                 case 6: //[]
-                    _color = Block.SQUARE;
-                    _shape = new Point[]{
-                        new Point(0,0),
-                        new Point(0,1),
-                        new Point(1,0),
-                        new Point(1,1),
-                    };
+                    generateSquare();
                     break;
 
                 default:
                     _shape = null;
                     break;
             }
+        }
+
+        private void generateSquare()
+        {
+            _color = Block.SQUARE;
+            _shape = new Point[][]{
+                    new Point[]{
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(1,0),
+                        new Point(1,1)},
+                    new Point[]{
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(1,0),
+                        new Point(1,1)},
+                    new Point[]{
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(1,0),
+                        new Point(1,1)},
+                    new Point[]{ 
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(1,0),
+                        new Point(1,1)}
+                    };
+            _rotation = 0;
+        }
+
+        private void generateS()
+        {
+            _color = Block.SSKEW;
+            _shape = new Point[][]{
+                    new Point[]{
+                        new Point(-1,1),
+                        new Point(0,1),
+                        new Point(0,0),
+                        new Point(1,0)},
+                    new Point[]{   
+                        new Point(0,-1),
+                        new Point(0,0),
+                        new Point(1,0),
+                        new Point(1,1)},
+                    new Point[]{   
+                        new Point(-1,1),
+                        new Point(0,1),
+                        new Point(0,0),
+                        new Point(1,0)},
+                    new Point[]{   
+                        new Point(0,-1),
+                        new Point(0,0),
+                        new Point(1,0),
+                        new Point(1,1)}
+                    };
+            _rotation = 0;
+        }
+
+        private void generateZ()
+        {
+            _color = Block.ZSKEW;
+            _shape = new Point[][]{
+                    new Point[]{
+                        new Point(-1,0),
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(1,1)},
+                    new Point[]{   
+                        new Point(0,1),
+                        new Point(0,0),
+                        new Point(1,0),
+                        new Point(1,-1)},
+                    new Point[]{   
+                        new Point(-1,0),
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(1,1)},
+                    new Point[]{   
+                        new Point(0,1),
+                        new Point(0,0),
+                        new Point(1,0),
+                        new Point(1,-1)}
+                    };
+            _rotation = 0;
+        }
+
+        private void generateJ()
+        {
+            _color = Block.JAY;
+            _shape = new Point[][]{
+                    new Point[]{
+                        new Point(-1,0),
+                        new Point(0,0),
+                        new Point(1,0),
+                        new Point(1,1)},
+                    new Point[]{   
+                        new Point(0,-1),
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(-1,1)},
+                    new Point[]{   
+                        new Point(-1,0),
+                        new Point(0,0),
+                        new Point(1,0),
+                        new Point(-1,-1)},
+                    new Point[]{   
+                        new Point(0,-1),
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(1,-1)}
+                    };
+            _rotation = 0;
+        }
+
+        private void generateLine()
+        {
+            _color = Block.LINE;
+            _shape = new Point[][]{
+                    new Point[]{
+                        new Point(0,0),
+                        new Point(-1,0),
+                        new Point(1,0),
+                        new Point(2,0)},
+                    new Point[]{
+                        new Point(1,-2),
+                        new Point(1,-1),
+                        new Point(1,0),
+                        new Point(1,1)},
+                    new Point[]{
+                        new Point(0,0),
+                        new Point(-1,0),
+                        new Point(1,0),
+                        new Point(2,0)},
+                    new Point[]{
+                        new Point(1,-2),
+                        new Point(1,-1),
+                        new Point(1,0),
+                        new Point(1,1)}
+                    };
+            _rotation = 0;
+        }
+
+        private void generateL()
+        {
+            _color = Block.EL;
+            _shape = new Point[][]{
+                    new Point[]{
+                        new Point(-1,0),
+                        new Point(0,0),
+                        new Point(1,0),
+                        new Point(-1,1)},
+                    new Point[]{   
+                        new Point(0,-1),
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(-1,-1)},
+                    new Point[]{   
+                        new Point(-1,0),
+                        new Point(0,0),
+                        new Point(1,0),
+                        new Point(1,-1)},
+                    new Point[]{   
+                        new Point(0,-1),
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(1,1)}
+                    };
+            _rotation = 0;
+        }
+
+        private void generateT()
+        {
+            _color = Block.TEE;
+            _shape = new Point[][]{
+                    new Point[]{   
+                        new Point(0,0),
+                        new Point(-1,0),
+                        new Point(0,1),
+                        new Point(1,0)},
+                    new Point[]{   
+                        new Point(0,-1),
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(-1,0)},
+                    new Point[]{   
+                        new Point(0,0),
+                        new Point(-1,0),
+                        new Point(0,-1),
+                        new Point(1,0)},
+                    new Point[]{   
+                        new Point(0,-1),
+                        new Point(0,0),
+                        new Point(0,1),
+                        new Point(1,0)}
+                    };
+            _rotation = 0;
         }
 
         public Point Coordinates
@@ -123,11 +278,24 @@ namespace Tetris
             }
         }
 
+        public void Rotate()
+        {
+            _rotation++;
+        }
+
         public Point[] Shape
         {
             get
             {
-                return _shape;
+                return _shape[_rotation%4];
+            }
+        }
+
+        public Point[] NextRotation
+        {
+            get
+            {
+                return _shape[(_rotation+1) % 4];
             }
         }
 

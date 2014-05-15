@@ -47,6 +47,9 @@ namespace Tetris
                 Debug.WriteLine("_block is not null, dropping...");
                 if (!_board.dropBlock(_block))
                 {
+                    int score = _board.checkLines();
+                    if (score > 0)
+                        Debug.WriteLine("You cleared {0} lines!", score);
                     Debug.WriteLine("Cannot drop _block, setting it to null.");
                     _block = null;
                 }
