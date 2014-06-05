@@ -58,6 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="SoundLibrary.cs" />
     <Compile Include="SQLiteDatabase.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -103,6 +104,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\boing_x.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\success.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TETRISB.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\game-over.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\yeah.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

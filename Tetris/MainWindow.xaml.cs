@@ -39,6 +39,7 @@ namespace Tetris
         protected int _linesCleared;
         protected SoundPlayer _successSound;
         protected Random _rand;
+        protected SoundLibrary _soundLib;
 
         // TO DO LIST:
         // - Implement SQLite
@@ -57,13 +58,14 @@ namespace Tetris
             _board = new Board(this, grid, _width, _height, Brushes.White, Brushes.Gold);
             _predict = new Board(this, predictGrid, _predictHeight, _predictWidth, Brushes.Beige, Brushes.White);
             _rand = new Random((int)DateTime.Now.Ticks);
+            _soundLib = new SoundLibrary();
 
             _score = 0;
             _level = 1;
             _linesCleared = 0;
             updateScoreBoard(0);
             _successSound = new SoundPlayer();
-            _successSound.Stream = Properties.Resources.boing_x;
+            _successSound.Stream = Properties.Resources.success;
         }
 
         private void blockStepTimer_Tick(object sender, EventArgs e)
@@ -94,7 +96,10 @@ namespace Tetris
                 _linesCleared += lines;
                 _level = _linesCleared / 10 + 1;
                 _blockMoveTimer.Interval = (int) (500 / (Math.Pow(1.25, _level - 1)));
-                _successSound.Play();
+                if (lines == 4)
+                    _soundLib.Yeah();
+                else
+                    _soundLib.Success();
             }
             scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nTime interval: {3}", 
                 _level, _score, _linesCleared, _blockMoveTimer.Interval);
@@ -130,6 +135,7 @@ namespace Tetris
                 _blockMoveTimer.Stop();
                 _board.gameOver();
                 _predict.gameOver();
+                _soundLib.gameOver();
                 DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(
                     "Game Over!\nWould you like to play again?", "Game Over", MessageBoxButtons.YesNo);
                 if (dialogResult == System.Windows.Forms.DialogResult.Yes)
