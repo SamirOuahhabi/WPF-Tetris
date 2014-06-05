@@ -3,12 +3,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Tetris" Height="720" Width="600" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown">
     <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="Black" Offset="0"/>
+                <GradientStop Color="#FFC4C7DE" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
         <Grid x:Name="grid" Margin="0,0,200,0" />
         <Menu HorizontalAlignment="Left" Height="18" Margin="392,0,0,0" VerticalAlignment="Top" Width="200">
             <MenuItem Header="File">
                 <MenuItem Header="Exit" HorizontalAlignment="Left" Width="140" Click="MenuItem_Click"/>
             </MenuItem>
         </Menu>
+        <Grid x:Name="predictGrid" HorizontalAlignment="Left" Height="150" Margin="418,170,0,0" VerticalAlignment="Top" Width="150"/>
+        <Label x:Name="scoreBoard" Content="Label" HorizontalAlignment="Left" Height="80" Margin="418,85,0,0" VerticalAlignment="Top" Width="150" Background="White"/>
 
     </Grid>
 </Window>

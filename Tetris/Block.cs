@@ -22,17 +22,18 @@ namespace Tetris
         protected Point _coordinates;
         protected SolidColorBrush _color;
         protected int _rotation;
+        protected string _type;
+        protected Random _rand;
 
-        public Block()
+        public Block(Random rand)
         {
+            _rand = rand;
             generateBlock();
         }
 
         protected void generateBlock()
         {
-            Random rand = new Random();
-
-            switch (rand.Next() % 7)
+            switch (_rand.Next() % 7)
             {
                 case 0: //T
                     generateT();
@@ -68,11 +69,14 @@ namespace Tetris
                     _shape = null;
                     break;
             }
+
+            _rotation = _rand.Next(0, 4);
         }
 
         private void generateSquare()
         {
             _color = Block.SQUARE;
+            _type = "Square";
             _shape = new Point[][]{
                     new Point[]{
                         new Point(0,0),
@@ -95,12 +99,12 @@ namespace Tetris
                         new Point(1,0),
                         new Point(1,1)}
                     };
-            _rotation = 0;
         }
 
         private void generateS()
         {
             _color = Block.SSKEW;
+            _type = "S Skew";
             _shape = new Point[][]{
                     new Point[]{
                         new Point(-1,1),
@@ -123,12 +127,12 @@ namespace Tetris
                         new Point(1,0),
                         new Point(1,1)}
                     };
-            _rotation = 0;
         }
 
         private void generateZ()
         {
             _color = Block.ZSKEW;
+            _type = "Z Skew";
             _shape = new Point[][]{
                     new Point[]{
                         new Point(-1,0),
@@ -151,12 +155,12 @@ namespace Tetris
                         new Point(1,0),
                         new Point(1,-1)}
                     };
-            _rotation = 0;
         }
 
         private void generateJ()
         {
             _color = Block.JAY;
+            _type = "Jay";
             _shape = new Point[][]{
                     new Point[]{
                         new Point(-1,0),
@@ -179,12 +183,12 @@ namespace Tetris
                         new Point(0,1),
                         new Point(1,-1)}
                     };
-            _rotation = 0;
         }
 
         private void generateLine()
         {
             _color = Block.LINE;
+            _type = "Straight line";
             _shape = new Point[][]{
                     new Point[]{
                         new Point(0,0),
@@ -207,12 +211,12 @@ namespace Tetris
                         new Point(1,0),
                         new Point(1,1)}
                     };
-            _rotation = 0;
         }
 
         private void generateL()
         {
             _color = Block.EL;
+            _type = "El";
             _shape = new Point[][]{
                     new Point[]{
                         new Point(-1,0),
@@ -235,12 +239,12 @@ namespace Tetris
                         new Point(0,1),
                         new Point(1,1)}
                     };
-            _rotation = 0;
         }
 
         private void generateT()
         {
             _color = Block.TEE;
+            _type = "Tee";
             _shape = new Point[][]{
                     new Point[]{   
                         new Point(0,0),
@@ -263,7 +267,6 @@ namespace Tetris
                         new Point(0,1),
                         new Point(1,0)}
                     };
-            _rotation = 0;
         }
 
         public Point Coordinates
@@ -305,6 +308,19 @@ namespace Tetris
             {
                 return _color;
             }
+        }
+
+        public string Type
+        {
+            get
+            {
+                return _type;
+            }
+        }
+
+        public override string ToString()
+        {
+            return _type;
         }
     }
 }

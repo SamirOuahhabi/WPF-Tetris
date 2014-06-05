@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Media;
+using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,20 +27,43 @@ namespace Tetris
     {
         protected const int _height = 18;
         protected const int _width = 10;
+        protected const int _predictHeight = 6;
+        protected const int _predictWidth = 6;
         protected Board _board;
+        protected Board _predict;
         protected Timer _blockMoveTimer;
         protected Block _block;
+        protected Block _nextBlock;
+        protected int _level;
+        protected int _score;
+        protected int _linesCleared;
+        protected SoundPlayer _successSound;
+        protected Random _rand;
+
+        // TO DO LIST:
+        // - Implement SQLite
+        // - LeaderBoard stored in SQLite
+        // - Config stored in SQLite
 
         public Game()
         {
             InitializeComponent();
-            initGrid();
+            initGrids();
             _blockMoveTimer = new Timer();
-            _blockMoveTimer.Interval = 700;
+            _blockMoveTimer.Interval = 500;
             _blockMoveTimer.Tick += new EventHandler(blockStepTimer_Tick);
             _blockMoveTimer.Enabled = false;
 
-            _board = new Board(this, grid, _width, _height, Brushes.White, Brushes.Black);
+            _board = new Board(this, grid, _width, _height, Brushes.White, Brushes.Gold);
+            _predict = new Board(this, predictGrid, _predictHeight, _predictWidth, Brushes.Beige, Brushes.White);
+            _rand = new Random((int)DateTime.Now.Ticks);
+
+            _score = 0;
+            _level = 1;
+            _linesCleared = 0;
+            updateScoreBoard(0);
+            _successSound = new SoundPlayer();
+            _successSound.Stream = Properties.Resources.boing_x;
         }
 
         private void blockStepTimer_Tick(object sender, EventArgs e)
@@ -47,9 +73,8 @@ namespace Tetris
                 Debug.WriteLine("_block is not null, dropping...");
                 if (!_board.dropBlock(_block))
                 {
-                    int score = _board.checkLines();
-                    if (score > 0)
-                        Debug.WriteLine("You cleared {0} lines!", score);
+                    int lines = _board.checkLines();
+                    updateScoreBoard(lines);
                     Debug.WriteLine("Cannot drop _block, setting it to null.");
                     _block = null;
                 }
@@ -61,13 +86,41 @@ namespace Tetris
             }
         }
 
+        protected void updateScoreBoard(int lines)
+        {
+            if(lines>0)
+            {
+                _score += _level * (100 + 150 * (lines - 1));
+                _linesCleared += lines;
+                _level = _linesCleared / 10 + 1;
+                _blockMoveTimer.Interval = (int) (500 / (Math.Pow(1.25, _level - 1)));
+                _successSound.Play();
+            }
+            scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nTime interval: {3}", 
+                _level, _score, _linesCleared, _blockMoveTimer.Interval);
+        }
+
         private void spawnBlock()
         {
-            _block = new Block();
-            _block.Coordinates = new Point(4, 0);
+            if(_nextBlock==null)
+            {
+                _nextBlock = new Block(_rand);
+                _nextBlock.Coordinates = new Point(2,2);
+                Debug.WriteLine("Next block spawned: "+_nextBlock.Type);
+            }
+
+            _block = _nextBlock;
+            _block.Coordinates = new Point(_rand.Next(3, _width-3), 0);
+            Debug.WriteLine("_block becomes: " + _block.Type);
+            _nextBlock = new Block(_rand);
+            _nextBlock.Coordinates = new Point(2, 2);
+            Debug.WriteLine("Next block spawned: " + _nextBlock.Type);
+
             if (_board.canSpawn(_block))
             {
                 Debug.WriteLine("_block spawned, drawing...");
+                _predict.Reset();
+                _predict.Draw(_nextBlock);
                 _board.Draw(_block);
             }
             else
@@ -75,17 +128,47 @@ namespace Tetris
                 _block = null;
                 Debug.WriteLine("_block cannot spawn...\n GAME OVER");
                 _blockMoveTimer.Stop();
+                _board.gameOver();
+                _predict.gameOver();
+                DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(
+                    "Game Over!\nWould you like to play again?", "Game Over", MessageBoxButtons.YesNo);
+                if (dialogResult == System.Windows.Forms.DialogResult.Yes)
+                {
+                    _board.Reset();
+                    Reset();
+                    _blockMoveTimer.Start();
+                }
+                else if (dialogResult == System.Windows.Forms.DialogResult.No)
+                {
+                    this.Close();
+                }
             }
         }
 
-        protected void initGrid()
+        protected void Reset()
         {
+            _score = 0;
+            _level = 0;
+            _linesCleared = 0;
+            _blockMoveTimer.Interval = 500;
+            updateScoreBoard(0);
+            _block = null;
+            _nextBlock = null;
+        }
+
+        protected void initGrids()
+        {
+            // Main Grid
             for( int r = 0; r < _height; r ++ )
                 grid.RowDefinitions.Add(new RowDefinition());
-
-            ColumnDefinition col = new ColumnDefinition();
             for (int c = 0; c < _width; c++)
                 grid.ColumnDefinitions.Add(new ColumnDefinition());
+
+            //Prediction Grid
+            for (int r = 0; r < _predictHeight; r++)
+                predictGrid.RowDefinitions.Add(new RowDefinition());
+            for (int c = 0; c < _predictWidth; c++)
+                predictGrid.ColumnDefinitions.Add(new ColumnDefinition());
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -95,15 +178,6 @@ namespace Tetris
 
         private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if(e.Key == Key.Enter)
-            {
-                Debug.WriteLine("Enter key pressed.");
-                if (_block == null)
-                {
-                    Debug.WriteLine("_block is null, spawning...");
-                    spawnBlock();
-                }
-            }
             if(e.Key == Key.F2)
             {
                 Debug.WriteLine("F2 key pressed.");

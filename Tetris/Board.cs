@@ -35,7 +35,7 @@ namespace Tetris
                 {
                     _occupied[r, c] = false;
                     _cells[r, c] = new Rectangle();
-                    _cells[r, c].Name = "rect_" + r + "_" + c;
+                    _cells[r, c].Name = grid.Name+"_rect_" + r + "_" + c;
                     window.RegisterName(_cells[r, c].Name, _cells[r, c]);
                     _cells[r, c].Stretch = Stretch.Fill;
                     _cells[r, c].Fill = _background;
@@ -45,6 +45,17 @@ namespace Tetris
                     Grid.SetRow(_cells[r, c], r);
 
                     grid.Children.Add(_cells[r, c]);
+                }
+        }
+
+        public void Reset()
+        {
+            for( int r = 0; r < _height; r ++ )
+                for (int c = 0; c < _width; c++)
+                {
+                    _occupied[r, c] = false;
+                    _cells[r, c].Fill = _background;
+                    _cells[r, c].Stroke = _borders;
                 }
         }
 
@@ -74,17 +85,15 @@ namespace Tetris
             Erase(b);
 
 
-            /*for (int i = 0; i < b.Shape.Length; i++)
+            for (int i = 0; i < b.Shape.Length; i++)
             {
-                if (!inBound((int)(b.Shape[i].Y + b.Coordinates.Y),
-                        (int)(b.Shape[i].X + b.Coordinates.X) + 1) ||
-                        isOccupied((int)(b.Shape[i].Y + b.Coordinates.Y),
+                if (isOccupied((int)(b.Shape[i].Y + b.Coordinates.Y),
                         (int)(b.Shape[i].X + b.Coordinates.X) + 1))
                 {
                     Draw(b);
                     return false;
                 }
-            }*/
+            }
 
             b.Coordinates = new Point(b.Coordinates.X + 1, b.Coordinates.Y);
             adjustBlock(b);
@@ -99,9 +108,7 @@ namespace Tetris
             Erase(b);
             for (int i = 0; i < b.Shape.Length; i++)
             {
-                if (!inBound((int)(b.Shape[i].Y + b.Coordinates.Y),
-                        (int)(b.Shape[i].X + b.Coordinates.X) - 1) ||
-                        isOccupied((int)(b.Shape[i].Y + b.Coordinates.Y),
+                if (isOccupied((int)(b.Shape[i].Y + b.Coordinates.Y),
                         (int)(b.Shape[i].X + b.Coordinates.X) - 1))
                 {
                     Draw(b);
@@ -110,6 +117,7 @@ namespace Tetris
             }
 
             b.Coordinates = new Point(b.Coordinates.X - 1, b.Coordinates.Y);
+            adjustBlock(b);
             Draw(b);
 
             return true;
@@ -157,8 +165,7 @@ namespace Tetris
             Erase(_block);
             for(int i=0; i<_block.Shape.Length; i++)
             {
-                if( !inBound((int)(_block.Shape[i].Y + _block.Coordinates.Y)+1,
-                    (int)(_block.Shape[i].X + _block.Coordinates.X)) || 
+                if( (_block.Shape[i].Y + _block.Coordinates.Y)+1 >= _height || 
                     isOccupied((int)(_block.Shape[i].Y + _block.Coordinates.Y)+1,
                     (int)(_block.Shape[i].X + _block.Coordinates.X)))
                 {
@@ -176,6 +183,14 @@ namespace Tetris
         public bool rotateBlock(Block _block)
         {
             Erase(_block);
+
+            for (int i = 0; i < _block.Shape.Length; i++ )
+                if (isOccupied((int)(_block.NextRotation[i].Y + _block.Coordinates.Y),
+                    (int)(_block.NextRotation[i].X + _block.Coordinates.X)))
+                {
+                    Draw(_block);
+                    return false;
+                }
 
             _block.Rotate();
             adjustBlock(_block);
@@ -243,6 +258,20 @@ namespace Tetris
                     _cells[r, c].Fill = _background;
                     _occupied[r, c] = false;
                 }
+        }
+
+        public void gameOver()
+        {
+            for (int r = 0; r < _height; r++)
+                for (int c = 0; c < _width; c++)
+                {
+                    if (_occupied[r, c])
+                        _cells[r, c].Fill = Brushes.Gray;
+                    else
+                        _cells[r, c].Fill = Brushes.White;
+                    _cells[r, c].Stroke = Brushes.Black;
+                }
+
         }
     }
 }
