@@ -23,17 +23,22 @@ namespace Tetris
         protected SolidColorBrush _color;
         protected int _rotation;
         protected string _type;
-        protected Random _rand;
 
         public Block(Random rand)
         {
-            _rand = rand;
-            generateBlock();
+            generateBlock(rand.Next() % 7);
+            _rotation = rand.Next(0, 4);
         }
 
-        protected void generateBlock()
+        public Block(int shape, int rotation)
         {
-            switch (_rand.Next() % 7)
+            generateBlock(shape);
+            _rotation = rotation;
+        }
+
+        protected void generateBlock(int shape)
+        {
+            switch (shape)
             {
                 case 0: //T
                     generateT();
@@ -69,8 +74,6 @@ namespace Tetris
                     _shape = null;
                     break;
             }
-
-            _rotation = _rand.Next(0, 4);
         }
 
         private void generateSquare()

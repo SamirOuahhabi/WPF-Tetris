@@ -37,7 +37,6 @@ namespace Tetris
         protected int _level;
         protected int _score;
         protected int _linesCleared;
-        protected SoundPlayer _successSound;
         protected Random _rand;
         protected SoundLibrary _soundLib;
 
@@ -64,8 +63,6 @@ namespace Tetris
             _level = 1;
             _linesCleared = 0;
             updateScoreBoard(0);
-            _successSound = new SoundPlayer();
-            _successSound.Stream = Properties.Resources.success;
         }
 
         private void blockStepTimer_Tick(object sender, EventArgs e)
