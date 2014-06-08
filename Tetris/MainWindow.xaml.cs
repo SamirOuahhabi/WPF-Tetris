@@ -174,7 +174,7 @@ namespace Tetris
                 predictGrid.ColumnDefinitions.Add(new ColumnDefinition());
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void ExitMenu_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
@@ -206,6 +206,12 @@ namespace Tetris
                 if (_block != null)
                     _board.rotateBlock(_block);
             }
+        }
+
+        private void SaveMenu_Click(object sender, RoutedEventArgs e)
+        {
+            _blockMoveTimer.Enabled = false;
+
         }
     }
 }

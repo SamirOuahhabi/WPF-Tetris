@@ -12,7 +12,8 @@
         <Grid x:Name="grid" Margin="0,0,200,0" />
         <Menu HorizontalAlignment="Left" Height="18" Margin="392,0,0,0" VerticalAlignment="Top" Width="200">
             <MenuItem Header="File">
-                <MenuItem Header="Exit" HorizontalAlignment="Left" Width="140" Click="MenuItem_Click"/>
+                <MenuItem Header="_Save progress" HorizontalAlignment="Left" Width="140" Click="SaveMenu_Click"/>
+                <MenuItem Header="Exit" HorizontalAlignment="Left" Width="140" Click="ExitMenu_Click"/>
             </MenuItem>
         </Menu>
         <Grid x:Name="predictGrid" HorizontalAlignment="Left" Height="150" Margin="418,170,0,0" VerticalAlignment="Top" Width="150"/>
