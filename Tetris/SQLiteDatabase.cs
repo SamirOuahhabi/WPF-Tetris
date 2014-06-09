@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Data;
 using Finisar.SQLite;
 using System.Diagnostics;
+using System.Collections;
 
 namespace Tetris
 {
@@ -15,12 +16,58 @@ namespace Tetris
         protected string _filename;
         protected bool _connected;
         protected bool _tableReady;
+        protected string _savedTable;
 
         public SQLiteDatabase(string filename)
         {
             _filename = filename;
+            _savedTable = "savedGames";
             initDb();
-            initTable();
+            initTables();
+        }
+
+        public SavedInstance getSavedInstanceById(int id)
+        {
+            SavedInstance si = new SavedInstance();
+            string query = "select * from " + _savedTable + " where id=" + id;
+
+            SQLiteDataReader reader = execReader(query);
+            while (reader.Read())
+            {
+                si.Name = (string)reader["name"];
+                si.Board = (string)reader["board"];
+                si.Score = reader.GetInt32(reader.GetOrdinal("score"));
+                si.LinesCleared = reader.GetInt32(reader.GetOrdinal("linescleared"));
+            }
+
+            return si;
+        }
+
+        public bool saveNewInstance(SavedInstance si)
+        {
+            string query = "INSERT INTO "+_savedTable+"(`name`, `board`, `score`, `linescleared`)";
+            query += " VALUES(\'" + si.Name + "\', \'" + si.Board + "\', \'" + si.Score;
+            query += "\', \'" + si.LinesCleared + "\')";
+            return execNonQuery(query);
+        }
+
+        public SavedInstance[] getAllInstances()
+        {
+            ArrayList list = new ArrayList();
+
+            string query = "select * from " + _savedTable;
+
+            SQLiteDataReader reader = execReader(query);
+            {
+                SavedInstance si = new SavedInstance();
+                si.Name = (string)reader["name"];
+                si.Board = (string)reader["board"];
+                si.Score = (int)reader["score"];
+                si.LinesCleared = (int)reader["linescleared"];
+                list.Add(si);
+            }
+
+            return (SavedInstance[]) list.ToArray();
         }
 
         public bool execNonQuery(string query)
@@ -58,74 +105,6 @@ namespace Tetris
                 catch (Exception e)
                 {
                     Debug.WriteLine(e.ToString());
-                    return null;
-                }
-            }
-            return null;
-        }
-
-        public DataTable getDataTable(string query)
-        {
-            if(Ready)
-            {
-                DataTable dt = new DataTable();
-                DataColumn c1, c2, c3, c4, c5, c6;
-                DataRow row;
-
-                c1 = new DataColumn();
-                c1.DataType = Type.GetType("System.Int32");
-                c1.ColumnName = "ID";
-                dt.Columns.Add(c1);
-
-                c2 = new DataColumn();
-                c2.DataType = Type.GetType("System.String");
-                c2.ColumnName = "Filename";
-                dt.Columns.Add(c2);
-
-                c3 = new DataColumn();
-                c3.DataType = Type.GetType("System.String");
-                c3.ColumnName = "Path";
-                dt.Columns.Add(c3);
-
-                c4 = new DataColumn();
-                c4.DataType = Type.GetType("System.String");
-                c4.ColumnName = "Event";
-                dt.Columns.Add(c4);
-
-                c5 = new DataColumn();
-                c5.DataType = Type.GetType("System.String");
-                c5.ColumnName = "Time";
-                dt.Columns.Add(c5);
-
-                c6 = new DataColumn();
-                c6.DataType = Type.GetType("System.String");
-                c6.ColumnName = "Date";
-                dt.Columns.Add(c6);
-
-
-                try
-                {
-                    SQLiteDataReader reader = execReader(query);
-                    while (reader.Read())
-                    {
-                        row = dt.NewRow();
-                        row["ID"] = reader["id"];
-                        row["Filename"] = reader["filename"];
-                        row["Path"] = reader["path"];
-                        row["Event"] = reader["event"];
-                        string time = new DateTime(Int64.Parse((string)reader["eventTime"])).ToString("T");
-                        string date = new DateTime(Int64.Parse((string)reader["eventTime"])).ToString("d");
-                        row["Time"] = time;
-                        row["Date"] = date;
-                        dt.Rows.Add(row);
-                    }
-
-                    return dt;
-                }
-                catch(Exception e)
-                {
-                    Debug.WriteLine(e.ToString());
-                    Debug.WriteLine(dt.GetErrors());
                     return null;
                 }
             }
@@ -170,13 +149,13 @@ namespace Tetris
 
         }
 
-        private void initTable()
+        private void initTables()
         {
             if (_connected)
             {
                 bool tableExists = false;
                 SQLiteCommand cmd = _conn.CreateCommand();
-                cmd.CommandText = "SELECT * FROM events";
+                cmd.CommandText = "SELECT * FROM "+_savedTable;
                 try
                 {
                     cmd.ExecuteNonQuery();
@@ -190,8 +169,8 @@ namespace Tetris
 
                 if (!tableExists)
                 {
-                    cmd.CommandText = "CREATE TABLE events (id integer primary key, filename varchar(100),"
-                        + "path varchar(255), event varchar(100), eventTime varchar(100))";
+                    cmd.CommandText = "CREATE TABLE "+_savedTable+" (id integer primary key, name varchar(40),"
+                        + "board varchar(255), score integer, linescleared integer)";
                     try
                     {
                         cmd.ExecuteNonQuery();

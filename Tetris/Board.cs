@@ -59,6 +59,58 @@ namespace Tetris
                 }
         }
 
+        public void Load(string board)
+        {
+            StringBuilder str = new StringBuilder(board);
+            int i, r, c;
+            for (i = 0; i < str.Length; i ++ )
+            {
+                r = i / _width;
+                c = i % _width;
+                if (str[i] == 'T')
+                {
+                    _occupied[r, c] = true;
+                    _cells[r, c].Fill = Block.TEE;
+                }
+
+                if (str[i] == 'E')
+                {
+                    _occupied[r, c] = true;
+                    _cells[r, c].Fill = Block.EL;
+                }
+
+                if (str[i] == 'L')
+                {
+                    _occupied[r, c] = true;
+                    _cells[r, c].Fill = Block.LINE;
+                }
+
+                if (str[i] == 'J')
+                {
+                    _occupied[r, c] = true;
+                    _cells[r, c].Fill = Block.JAY;
+                }
+
+                if (str[i] == 'Z')
+                {
+                    _occupied[r, c] = true;
+                    _cells[r, c].Fill = Block.ZSKEW;
+                }
+
+                if (str[i] == 'S')
+                {
+                    _occupied[r, c] = true;
+                    _cells[r, c].Fill = Block.SSKEW;
+                }
+
+                if (str[i] == 'Q')
+                {
+                    _occupied[r, c] = true;
+                    _cells[r, c].Fill = Block.SQUARE;
+                }
+            }
+        }
+
         public bool isOccupied(int r, int c)
         {
             if (!inBound(r, c))
@@ -272,6 +324,37 @@ namespace Tetris
                     _cells[r, c].Stroke = Brushes.Black;
                 }
 
+        }
+
+        public override string ToString()
+        {
+            string str = "", temp;
+
+            for (int r = 0; r < _height; r++)
+            {
+                for (int c = 0; c < _width; c++)
+                {
+                    temp = _cells[r, c].Fill.ToString();
+                    if (temp.Equals(Block.TEE.ToString(), StringComparison.OrdinalIgnoreCase))
+                        str+="T";
+                    else if (temp.Equals(Block.EL.ToString(), StringComparison.OrdinalIgnoreCase))
+                        str+="E";
+                    else if (temp.Equals(Block.LINE.ToString(), StringComparison.OrdinalIgnoreCase))
+                        str+="L";
+                    else if (temp.Equals(Block.JAY.ToString(), StringComparison.OrdinalIgnoreCase))
+                        str+="J";
+                    else if (temp.Equals(Block.ZSKEW.ToString(), StringComparison.OrdinalIgnoreCase))
+                        str+="Z";
+                    else if (temp.Equals(Block.SSKEW.ToString(), StringComparison.OrdinalIgnoreCase))
+                        str+="S";
+                    else if (temp.Equals(Block.SQUARE.ToString(), StringComparison.OrdinalIgnoreCase))
+                        str+="Q";
+                    else
+                        str+="#";
+                }
+            }
+
+            return str;
         }
     }
 }

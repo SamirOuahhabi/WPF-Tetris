@@ -12,6 +12,7 @@ namespace Tetris
         protected SoundPlayer _success;
         protected SoundPlayer _gameOver;
         protected SoundPlayer _yeah;
+        protected SoundPlayer _tic;
 
         public SoundLibrary()
         {
@@ -23,6 +24,9 @@ namespace Tetris
 
             _yeah = new SoundPlayer();
             _yeah.Stream = Properties.Resources.yeah;
+
+            _tic = new SoundPlayer();
+            _tic.Stream = Properties.Resources.tic;
         }
 
         public void Success()
@@ -38,6 +42,11 @@ namespace Tetris
         public void Yeah()
         {
             _yeah.Play();
+        }
+
+        public void tic()
+        {
+            _tic.Play();
         }
     }
 }

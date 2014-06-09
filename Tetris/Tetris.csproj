@@ -39,6 +39,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -58,8 +59,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="SavedInstance.cs" />
     <Compile Include="SoundLibrary.cs" />
     <Compile Include="SQLiteDatabase.cs" />
+    <Compile Include="Util.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -113,6 +116,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\yeah.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tetris.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bloop.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bleep.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tic.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

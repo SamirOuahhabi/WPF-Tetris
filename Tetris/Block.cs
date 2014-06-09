@@ -10,13 +10,13 @@ namespace Tetris
 {
     public class Block
     {
-        public static SolidColorBrush LINE = Brushes.Cyan;
-        public static SolidColorBrush SQUARE = Brushes.Yellow;
         public static SolidColorBrush TEE = Brushes.HotPink;
-        public static SolidColorBrush JAY = Brushes.Blue;
         public static SolidColorBrush EL = Brushes.Orange;
-        public static SolidColorBrush SSKEW = Brushes.LightGreen;
+        public static SolidColorBrush LINE = Brushes.Cyan;
+        public static SolidColorBrush JAY = Brushes.Blue;
         public static SolidColorBrush ZSKEW = Brushes.Red;
+        public static SolidColorBrush SSKEW = Brushes.LightGreen;
+        public static SolidColorBrush SQUARE = Brushes.Yellow;
 
         protected Point[][] _shape;
         protected Point _coordinates;

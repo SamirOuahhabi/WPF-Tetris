@@ -39,6 +39,7 @@ namespace Tetris
         protected int _linesCleared;
         protected Random _rand;
         protected SoundLibrary _soundLib;
+        protected SQLiteDatabase _database;
 
         // TO DO LIST:
         // - Implement SQLite
@@ -49,6 +50,11 @@ namespace Tetris
         {
             InitializeComponent();
             initGrids();
+
+            _database = new SQLiteDatabase("tetris.db");
+
+            Icon = Util.ConvertToImageSource(Properties.Resources.tetris);
+
             _blockMoveTimer = new Timer();
             _blockMoveTimer.Interval = 500;
             _blockMoveTimer.Tick += new EventHandler(blockStepTimer_Tick);
@@ -77,6 +83,8 @@ namespace Tetris
                     Debug.WriteLine("Cannot drop _block, setting it to null.");
                     _block = null;
                 }
+                else
+                    _soundLib.tic();
             }
             else
             {
@@ -189,29 +197,72 @@ namespace Tetris
             if (e.Key == Key.Left)
             {
                 if (_block != null)
+                {
                     _board.moveLeft(_block);
+                    _soundLib.tic();
+                }
             }
             if (e.Key == Key.Right)
             {
                 if (_block != null)
+                {
                     _board.moveRight(_block);
+                    _soundLib.tic();
+                }
             }
             if (e.Key == Key.Down)
             {
                 if (_block != null)
+                {
                     _board.dropBlock(_block);
+                    _soundLib.tic();
+                }
             }
             if (e.Key == Key.Up)
             {
                 if (_block != null)
                     _board.rotateBlock(_block);
             }
+            if(e.Key == Key.Home)
+            {
+                _linesCleared += 10;
+                _level = _linesCleared / 10 + 1;
+                _blockMoveTimer.Interval = (int)(500 / (Math.Pow(1.25, _level - 1))); 
+                scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nTime interval: {3}",
+                    _level, _score, _linesCleared, _blockMoveTimer.Interval);
+            }
         }
 
         private void SaveMenu_Click(object sender, RoutedEventArgs e)
         {
             _blockMoveTimer.Enabled = false;
+            StringBuilder b = new StringBuilder(_board.ToString());
+            if(_block != null)
+                foreach (Point p in _block.Shape)
+                    b[(int)(p.Y + _block.Coordinates.Y) * _width + (int) (p.X + _block.Coordinates.X)] = '#';
 
+            string name = Util.ShowDialog("Choose a name:", "Save as");
+            Debug.WriteLine(name);
+
+            SavedInstance si = new SavedInstance(name, b.ToString(), _score, _linesCleared);
+            _database.saveNewInstance(si);
+        }
+
+        private void LoadMenu_Click(object sender, RoutedEventArgs e)
+        {
+            _blockMoveTimer.Enabled = false;
+            SavedInstance si = _database.getSavedInstanceById(1);
+            Reset();
+            _board.Reset();
+            _board.Load(si.Board);
+            _block = null;
+            _nextBlock = null;
+            _score = si.Score;
+            _linesCleared = si.LinesCleared;
+            _level = _linesCleared / 10 + 1;
+            _blockMoveTimer.Interval = (int)(500 / (Math.Pow(1.25, _level - 1)));
+            scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nTime interval: {3}",
+                _level, _score, _linesCleared, _blockMoveTimer.Interval);
         }
     }
 }
