@@ -17,11 +17,13 @@ namespace Tetris
         protected bool _connected;
         protected bool _tableReady;
         protected string _savedTable;
+        protected string _leaderTable;
 
         public SQLiteDatabase(string filename)
         {
             _filename = filename;
             _savedTable = "savedGames";
+            _leaderTable = "leaderBoard";
             initDb();
             initTables();
         }
@@ -34,6 +36,7 @@ namespace Tetris
             SQLiteDataReader reader = execReader(query);
             while (reader.Read())
             {
+                si.Id = reader.GetInt32(reader.GetOrdinal("id"));
                 si.Name = (string)reader["name"];
                 si.Board = (string)reader["board"];
                 si.Score = reader.GetInt32(reader.GetOrdinal("score"));
@@ -51,23 +54,44 @@ namespace Tetris
             return execNonQuery(query);
         }
 
-        public SavedInstance[] getAllInstances()
+        public ArrayList getAllInstances()
         {
             ArrayList list = new ArrayList();
 
             string query = "select * from " + _savedTable;
 
             SQLiteDataReader reader = execReader(query);
+            while (reader.Read())
             {
                 SavedInstance si = new SavedInstance();
+                si.Id = reader.GetInt32(reader.GetOrdinal("id"));
                 si.Name = (string)reader["name"];
                 si.Board = (string)reader["board"];
-                si.Score = (int)reader["score"];
-                si.LinesCleared = (int)reader["linescleared"];
+                si.Score = reader.GetInt32(reader.GetOrdinal("score"));
+                si.LinesCleared = reader.GetInt32(reader.GetOrdinal("linescleared"));
                 list.Add(si);
             }
 
-            return (SavedInstance[]) list.ToArray();
+            return list;
+        }
+
+        public int getHighScore()
+        {
+            int high = 0;
+
+            string query = "select MAX(score) as max from " + _leaderTable;
+            SQLiteDataReader reader = execReader(query);
+            while (reader.Read())
+                high = reader.GetInt32(reader.GetOrdinal("max"));
+
+            return high;
+        }
+
+        public bool  saveNewScore(int score, string name)
+        {
+            string query = "INSERT INTO " + _leaderTable + "(`name`, `score`)";
+            query += " VALUES(\'" + name + "\', \'" + score;
+            return execNonQuery(query);
         }
 
         public bool execNonQuery(string query)
@@ -155,7 +179,7 @@ namespace Tetris
             {
                 bool tableExists = false;
                 SQLiteCommand cmd = _conn.CreateCommand();
-                cmd.CommandText = "SELECT * FROM "+_savedTable;
+                cmd.CommandText = "SELECT * FROM " + _savedTable;
                 try
                 {
                     cmd.ExecuteNonQuery();
@@ -169,8 +193,38 @@ namespace Tetris
 
                 if (!tableExists)
                 {
-                    cmd.CommandText = "CREATE TABLE "+_savedTable+" (id integer primary key, name varchar(40),"
+                    cmd.CommandText = "CREATE TABLE " + _savedTable + " (id integer primary key, name varchar(40),"
                         + "board varchar(255), score integer, linescleared integer)";
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        _tableReady = true;
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine(e.ToString());
+                        _tableReady = false;
+                    }
+                }
+
+                tableExists = false;
+                cmd = _conn.CreateCommand();
+                cmd.CommandText = "SELECT * FROM " + _leaderTable;
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    tableExists = true;
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.ToString());
+                    tableExists = false;
+                }
+
+                if (!tableExists)
+                {
+                    cmd.CommandText = "CREATE TABLE " + _leaderTable + " (id integer primary key"
+                        + ", name varchar(40), score integer)";
                     try
                     {
                         cmd.ExecuteNonQuery();

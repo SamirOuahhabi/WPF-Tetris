@@ -1,9 +1,12 @@
 ﻿<Window x:Class="Tetris.LoadGame"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="LoadGame" Height="383.75" Width="691">
+        Title="LoadGame" Height="391.75" Width="426">
     <Grid>
-        <ListBox x:Name="list" HorizontalAlignment="Left" Height="320" Margin="10,10,0,0" VerticalAlignment="Top" Width="288"/>
+        <ListBox x:Name="list" HorizontalAlignment="Left" Height="340" Margin="10,10,0,0" VerticalAlignment="Top" Width="244"/>
+        <Grid x:Name="grid" HorizontalAlignment="Left" Height="270" Margin="259,10,0,0" VerticalAlignment="Top" Width="150"/>
+        <Button x:Name="preview" Content="Preview" HorizontalAlignment="Left" Height="30" Margin="259,285,0,0" VerticalAlignment="Top" Width="150" Click="preview_Click"/>
+        <Button x:Name="load" Content="Load" HorizontalAlignment="Left" Height="30" Margin="259,320,0,0" VerticalAlignment="Top" Width="150" Click="load_Click"/>
 
     </Grid>
 </Window>

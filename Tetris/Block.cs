@@ -284,16 +284,19 @@ namespace Tetris
             }
         }
 
-        public void Rotate()
+        public void Rotate(string direction)
         {
-            _rotation++;
+            if (direction.Equals("up", StringComparison.OrdinalIgnoreCase))
+                _rotation++;
+            else
+                _rotation--;
         }
 
         public Point[] Shape
         {
             get
             {
-                return _shape[_rotation%4];
+                return _shape[(40000 + _rotation) % 4];
             }
         }
 
@@ -301,7 +304,15 @@ namespace Tetris
         {
             get
             {
-                return _shape[(_rotation+1) % 4];
+                return _shape[(_rotation + 40001) % 4];
+            }
+        }
+
+        public Point[] PreviousRotation
+        {
+            get
+            {
+                return _shape[(_rotation - 1) % 4];
             }
         }
 

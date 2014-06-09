@@ -232,19 +232,23 @@ namespace Tetris
             return true;
         }
 
-        public bool rotateBlock(Block _block)
+        public bool rotateBlock(Block _block, string direction)
         {
             Erase(_block);
 
             for (int i = 0; i < _block.Shape.Length; i++ )
-                if (isOccupied((int)(_block.NextRotation[i].Y + _block.Coordinates.Y),
+                if ((direction.Equals("up", StringComparison.OrdinalIgnoreCase) && 
+                    isOccupied((int)(_block.NextRotation[i].Y + _block.Coordinates.Y),
                     (int)(_block.NextRotation[i].X + _block.Coordinates.X)))
+                    && (direction.Equals("down", StringComparison.OrdinalIgnoreCase) &&
+                    isOccupied((int)(_block.PreviousRotation[i].Y + _block.Coordinates.Y),
+                    (int)(_block.PreviousRotation[i].X + _block.Coordinates.X))))
                 {
                     Draw(_block);
                     return false;
                 }
 
-            _block.Rotate();
+            _block.Rotate(direction);
             adjustBlock(_block);
             Draw(_block);
             return true;

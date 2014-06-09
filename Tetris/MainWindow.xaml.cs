@@ -40,6 +40,7 @@ namespace Tetris
         protected Random _rand;
         protected SoundLibrary _soundLib;
         protected SQLiteDatabase _database;
+        protected LoadGame _loadGame;
 
         // TO DO LIST:
         // - Implement SQLite
@@ -159,7 +160,7 @@ namespace Tetris
         protected void Reset()
         {
             _score = 0;
-            _level = 0;
+            _level = 1;
             _linesCleared = 0;
             _blockMoveTimer.Interval = 500;
             updateScoreBoard(0);
@@ -210,7 +211,7 @@ namespace Tetris
                     _soundLib.tic();
                 }
             }
-            if (e.Key == Key.Down)
+            if (e.Key == Key.Space)
             {
                 if (_block != null)
                 {
@@ -221,7 +222,12 @@ namespace Tetris
             if (e.Key == Key.Up)
             {
                 if (_block != null)
-                    _board.rotateBlock(_block);
+                    _board.rotateBlock(_block, "up");
+            }
+            if (e.Key == Key.Down)
+            {
+                if (_block != null)
+                    _board.rotateBlock(_block, "down");
             }
             if(e.Key == Key.Home)
             {
@@ -251,7 +257,20 @@ namespace Tetris
         private void LoadMenu_Click(object sender, RoutedEventArgs e)
         {
             _blockMoveTimer.Enabled = false;
-            /*SavedInstance si = _database.getSavedInstanceById(1);
+            _loadGame = new LoadGame(this);
+            _loadGame.Show();
+        }
+
+        private void NewMenu_Click(object sender, RoutedEventArgs e)
+        {
+            Reset();
+            _board.Reset();
+            scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nTime interval: {3}",
+                _level, _score, _linesCleared, _blockMoveTimer.Interval);
+        }
+
+        public void Load(SavedInstance si)
+        {
             Reset();
             _board.Reset();
             _board.Load(si.Board);
@@ -262,9 +281,37 @@ namespace Tetris
             _level = _linesCleared / 10 + 1;
             _blockMoveTimer.Interval = (int)(500 / (Math.Pow(1.25, _level - 1)));
             scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nTime interval: {3}",
-                _level, _score, _linesCleared, _blockMoveTimer.Interval);*/
-            LoadGame l = new LoadGame();
-            l.Show();
+                _level, _score, _linesCleared, _blockMoveTimer.Interval);
+        }
+
+        public SQLiteDatabase Database
+        {
+            get
+            {
+                return _database;
+            }
+        }
+
+        public int BoardWidth
+        {
+            get
+            {
+                return _width;
+            }
+        }
+
+        public int BoardHeight
+        {
+            get
+            {
+                return _height;
+            }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (_loadGame != null && _loadGame.IsEnabled)
+                _loadGame.Close();
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Tetris
 {
     public class SavedInstance
     {
+        protected int _id;
         protected string _name;
         protected string _board;
         protected int _score;
@@ -23,6 +24,23 @@ namespace Tetris
             _board = board;
             _score = score;
             _linesCleared = linesCleared;
+        }
+
+        public override string ToString()
+        {
+            return _name + ": lvl " + (_linesCleared / 10 + 1) + ", score: " + _score;
+        }
+
+        public int Id
+        {
+            set
+            {
+                _id = value;
+            }
+            get
+            {
+                return _id;
+            }
         }
 
         public string Name
