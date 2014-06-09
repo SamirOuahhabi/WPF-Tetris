@@ -251,7 +251,7 @@ namespace Tetris
         private void LoadMenu_Click(object sender, RoutedEventArgs e)
         {
             _blockMoveTimer.Enabled = false;
-            SavedInstance si = _database.getSavedInstanceById(1);
+            /*SavedInstance si = _database.getSavedInstanceById(1);
             Reset();
             _board.Reset();
             _board.Load(si.Board);
@@ -262,7 +262,9 @@ namespace Tetris
             _level = _linesCleared / 10 + 1;
             _blockMoveTimer.Interval = (int)(500 / (Math.Pow(1.25, _level - 1)));
             scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nTime interval: {3}",
-                _level, _score, _linesCleared, _blockMoveTimer.Interval);
+                _level, _score, _linesCleared, _blockMoveTimer.Interval);*/
+            LoadGame l = new LoadGame();
+            l.Show();
         }
     }
 }
