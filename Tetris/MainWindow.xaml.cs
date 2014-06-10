@@ -41,6 +41,10 @@ namespace Tetris
         protected SoundLibrary _soundLib;
         protected SQLiteDatabase _database;
         protected LoadGame _loadGame;
+        protected int _highScore;
+        protected string _playerName;
+        protected bool _gameRunning;
+        protected AboutBox _about;
 
         // TO DO LIST:
         // - Implement SQLite
@@ -60,8 +64,9 @@ namespace Tetris
             _blockMoveTimer.Interval = 500;
             _blockMoveTimer.Tick += new EventHandler(blockStepTimer_Tick);
             _blockMoveTimer.Enabled = false;
+            _gameRunning = false;
 
-            _board = new Board(this, grid, _width, _height, Brushes.White, Brushes.Gold);
+            _board = new Board(this, grid, _width, _height, Brushes.White, Brushes.LightBlue);
             _predict = new Board(this, predictGrid, _predictHeight, _predictWidth, Brushes.Beige, Brushes.White);
             _rand = new Random((int)DateTime.Now.Ticks);
             _soundLib = new SoundLibrary();
@@ -69,7 +74,43 @@ namespace Tetris
             _score = 0;
             _level = 1;
             _linesCleared = 0;
+            _highScore = _database.getHighScore();
             updateScoreBoard(0);
+
+            _playerName = "Player1";
+            nameLabel.Content = string.Format("Name: {0}", _playerName);
+            handleMenuItems();
+        }
+
+        private void handleMenuItems()
+        {
+            newMenu.IsEnabled = true;
+            if(_gameRunning)
+            {
+                if(_blockMoveTimer.Enabled)
+                {
+                    pauseMenu.IsEnabled = true;
+                    resumeMenu.IsEnabled = false;
+                    loadMenu.IsEnabled = false;
+                    saveMenu.IsEnabled = false;
+                    pausedLabel.Text = "";
+                }
+                else
+                {
+                    pauseMenu.IsEnabled = false;
+                    resumeMenu.IsEnabled = true;
+                    loadMenu.IsEnabled = true;
+                    saveMenu.IsEnabled = true;
+                    pausedLabel.Text = "Paused";
+                }
+            }
+            else
+            {
+                pauseMenu.IsEnabled = false;
+                resumeMenu.IsEnabled = false;
+                loadMenu.IsEnabled = true;
+                saveMenu.IsEnabled = false;
+            }
         }
 
         private void blockStepTimer_Tick(object sender, EventArgs e)
@@ -107,8 +148,8 @@ namespace Tetris
                 else
                     _soundLib.Success();
             }
-            scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nTime interval: {3}", 
-                _level, _score, _linesCleared, _blockMoveTimer.Interval);
+            scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nHigh-score: {3}", 
+                _level, _score, _linesCleared, _highScore);
         }
 
         private void spawnBlock()
@@ -142,6 +183,17 @@ namespace Tetris
                 _board.gameOver();
                 _predict.gameOver();
                 _soundLib.gameOver();
+
+                if(_score > _database.getHighScore())
+                    System.Windows.Forms.MessageBox.Show(
+                    "Congrats "+_playerName+"! You got a new highscore!", "New Highscore", MessageBoxButtons.OK);
+
+                if (_score > 0)
+                    _database.saveNewScore(_score, _playerName);
+
+                _highScore = _database.getHighScore();
+                updateScoreBoard(0);
+
                 DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(
                     "Game Over!\nWould you like to play again?", "Game Over", MessageBoxButtons.YesNo);
                 if (dialogResult == System.Windows.Forms.DialogResult.Yes)
@@ -185,17 +237,76 @@ namespace Tetris
 
         private void ExitMenu_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(
+                        "Are you sure you want to exit the program?", "Exit", MessageBoxButtons.YesNo);
+            if (dialogResult == System.Windows.Forms.DialogResult.Yes)
+                Close();
         }
 
         private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if(e.Key == Key.F2)
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.N)
             {
-                Debug.WriteLine("F2 key pressed.");
-                _blockMoveTimer.Enabled = !_blockMoveTimer.Enabled;
+                if (_gameRunning)
+                {
+                    DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(
+                        "Another game is already running, would you like to reset the board?", "Game running", MessageBoxButtons.YesNo);
+                    if (dialogResult == System.Windows.Forms.DialogResult.Yes)
+                    {
+                        _board.Reset();
+                        Reset();
+                        _blockMoveTimer.Start();
+                    }
+                }
+                else
+                {
+                    _board.Reset();
+                    Reset();
+                    _blockMoveTimer.Start();
+                    _gameRunning = true;
+                }
+
+                handleMenuItems();
             }
-            if (e.Key == Key.Left)
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.P)
+            {
+                if (_gameRunning && _blockMoveTimer.Enabled)
+                    _blockMoveTimer.Enabled = false;
+
+                handleMenuItems();
+            }
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.G)
+            {
+                if (_gameRunning && !_blockMoveTimer.Enabled)
+                    _blockMoveTimer.Enabled = true;
+
+                handleMenuItems();
+            }
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
+            {
+                SaveMenu_Click(null, null);
+            }
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.O)
+            {
+                LoadMenu_Click(null, null);
+            }
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.X)
+            {
+                DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(
+                        "Are you sure you want to exit the program?", "Exit", MessageBoxButtons.YesNo);
+                if (dialogResult == System.Windows.Forms.DialogResult.Yes)
+                    Close();
+            }
+
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.A)
+                AboutMenu_Click(null, null);
+
+            if (_blockMoveTimer.Enabled && e.Key == Key.Left)
             {
                 if (_block != null)
                 {
@@ -205,7 +316,7 @@ namespace Tetris
             }
             if (e.Key == Key.Right)
             {
-                if (_block != null)
+                if (_blockMoveTimer.Enabled && _block != null)
                 {
                     _board.moveRight(_block);
                     _soundLib.tic();
@@ -213,7 +324,7 @@ namespace Tetris
             }
             if (e.Key == Key.Space)
             {
-                if (_block != null)
+                if (_blockMoveTimer.Enabled && _block != null)
                 {
                     _board.dropBlock(_block);
                     _soundLib.tic();
@@ -221,52 +332,92 @@ namespace Tetris
             }
             if (e.Key == Key.Up)
             {
-                if (_block != null)
+                if (_blockMoveTimer.Enabled && _block != null)
                     _board.rotateBlock(_block, "up");
             }
             if (e.Key == Key.Down)
             {
-                if (_block != null)
+                if (_blockMoveTimer.Enabled && _block != null)
                     _board.rotateBlock(_block, "down");
             }
             if(e.Key == Key.Home)
             {
-                _linesCleared += 10;
-                _level = _linesCleared / 10 + 1;
-                _blockMoveTimer.Interval = (int)(500 / (Math.Pow(1.25, _level - 1))); 
-                scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nTime interval: {3}",
-                    _level, _score, _linesCleared, _blockMoveTimer.Interval);
+                if (_gameRunning)
+                {
+                    _linesCleared += 10;
+                    _level = _linesCleared / 10 + 1;
+                    _blockMoveTimer.Interval = (int)(500 / (Math.Pow(1.25, _level - 1)))+1;
+                    updateScoreBoard(0);
+                }
             }
         }
 
         private void SaveMenu_Click(object sender, RoutedEventArgs e)
         {
-            _blockMoveTimer.Enabled = false;
-            StringBuilder b = new StringBuilder(_board.ToString());
-            if(_block != null)
-                foreach (Point p in _block.Shape)
-                    b[(int)(p.Y + _block.Coordinates.Y) * _width + (int) (p.X + _block.Coordinates.X)] = '#';
+            if (_gameRunning && !_blockMoveTimer.Enabled)
+            {
+                StringBuilder b = new StringBuilder(_board.ToString());
+                if (_block != null)
+                    foreach (Point p in _block.Shape)
+                        b[(int)(p.Y + _block.Coordinates.Y) * _width + (int)(p.X + _block.Coordinates.X)] = '#';
 
-            string name = Util.ShowDialog("Choose a name:", "Save as");
-            Debug.WriteLine(name);
+                string name = Util.ShowDialog("Choose a name:", "Save as");
+                Debug.WriteLine(name);
 
-            SavedInstance si = new SavedInstance(name, b.ToString(), _score, _linesCleared);
-            _database.saveNewInstance(si);
+                SavedInstance si = new SavedInstance(name, b.ToString(), _score, _linesCleared);
+                _database.saveNewInstance(si);
+            }
+            handleMenuItems();
         }
 
         private void LoadMenu_Click(object sender, RoutedEventArgs e)
         {
-            _blockMoveTimer.Enabled = false;
-            _loadGame = new LoadGame(this);
-            _loadGame.Show();
+            if (!_blockMoveTimer.Enabled)
+            {
+                _loadGame = new LoadGame(this);
+                _loadGame.Show();
+            }
+            handleMenuItems();
         }
 
         private void NewMenu_Click(object sender, RoutedEventArgs e)
         {
-            Reset();
-            _board.Reset();
-            scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nTime interval: {3}",
-                _level, _score, _linesCleared, _blockMoveTimer.Interval);
+            if (_gameRunning)
+            {
+                DialogResult dialogResult = System.Windows.Forms.MessageBox.Show(
+                    "Another game is already running, would you like to reset the board?", "Game running", MessageBoxButtons.YesNo);
+                if (dialogResult == System.Windows.Forms.DialogResult.Yes)
+                {
+                    _board.Reset();
+                    Reset();
+                    _blockMoveTimer.Start();
+                }
+            }
+            else
+            {
+                _board.Reset();
+                Reset();
+                _blockMoveTimer.Start();
+                _gameRunning = true;
+            }
+
+            handleMenuItems();
+        }
+
+        private void PauseMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (_gameRunning && _blockMoveTimer.Enabled)
+                _blockMoveTimer.Enabled = false;
+
+            handleMenuItems();
+        }
+
+        private void ResumeMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if (_gameRunning && !_blockMoveTimer.Enabled)
+                _blockMoveTimer.Enabled = true;
+
+            handleMenuItems();
         }
 
         public void Load(SavedInstance si)
@@ -280,8 +431,10 @@ namespace Tetris
             _linesCleared = si.LinesCleared;
             _level = _linesCleared / 10 + 1;
             _blockMoveTimer.Interval = (int)(500 / (Math.Pow(1.25, _level - 1)));
-            scoreBoard.Content = string.Format("Level {0}\nScore: {1}\nLines cleared: {2}\nTime interval: {3}",
-                _level, _score, _linesCleared, _blockMoveTimer.Interval);
+            updateScoreBoard(0);
+            _blockMoveTimer.Enabled = true;
+            _gameRunning = true;
+            handleMenuItems();
         }
 
         public SQLiteDatabase Database
@@ -312,6 +465,28 @@ namespace Tetris
         {
             if (_loadGame != null && _loadGame.IsEnabled)
                 _loadGame.Close();
+        }
+
+        private void change_Click(object sender, RoutedEventArgs e)
+        {
+            _playerName = Util.ShowDialog("Enter a new name:", "Change player name");
+            nameLabel.Content = string.Format("Name: {0}", _playerName);
+            var scope = FocusManager.GetFocusScope(change);
+            FocusManager.SetFocusedElement(scope, null);
+            Keyboard.ClearFocus();
+            Focus();
+        }
+
+        private void AboutMenu_Click(object sender, RoutedEventArgs e)
+        {
+            if(_about == null || _about.IsDisposed)
+            {
+                _about = new AboutBox();
+                _about.Show();
+            }
+            else
+                if(!_about.Visible)
+                    _about.Show();
         }
     }
 }

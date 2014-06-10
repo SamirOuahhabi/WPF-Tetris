@@ -87,10 +87,10 @@ namespace Tetris
             return high;
         }
 
-        public bool  saveNewScore(int score, string name)
+        public bool saveNewScore(int score, string name)
         {
             string query = "INSERT INTO " + _leaderTable + "(`name`, `score`)";
-            query += " VALUES(\'" + name + "\', \'" + score;
+            query += " VALUES(\'" + name + "\', \'" + score + "\')";
             return execNonQuery(query);
         }
 

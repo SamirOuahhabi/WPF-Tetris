@@ -10,13 +10,13 @@ namespace Tetris
 {
     public class Block
     {
-        public static SolidColorBrush TEE = Brushes.HotPink;
-        public static SolidColorBrush EL = Brushes.Orange;
-        public static SolidColorBrush LINE = Brushes.Cyan;
-        public static SolidColorBrush JAY = Brushes.Blue;
-        public static SolidColorBrush ZSKEW = Brushes.Red;
-        public static SolidColorBrush SSKEW = Brushes.LightGreen;
-        public static SolidColorBrush SQUARE = Brushes.Yellow;
+        public static SolidColorBrush TEE = Brushes.Crimson;
+        public static SolidColorBrush EL = Brushes.Teal;
+        public static SolidColorBrush LINE = Brushes.SlateBlue;
+        public static SolidColorBrush JAY = Brushes.YellowGreen;
+        public static SolidColorBrush ZSKEW = Brushes.MediumOrchid;
+        public static SolidColorBrush SSKEW = Brushes.SaddleBrown;
+        public static SolidColorBrush SQUARE = Brushes.Chocolate;
 
         protected Point[][] _shape;
         protected Point _coordinates;
@@ -289,14 +289,14 @@ namespace Tetris
             if (direction.Equals("up", StringComparison.OrdinalIgnoreCase))
                 _rotation++;
             else
-                _rotation--;
+                _rotation += 3;
         }
 
         public Point[] Shape
         {
             get
             {
-                return _shape[(40000 + _rotation) % 4];
+                return _shape[_rotation % 4];
             }
         }
 
@@ -304,7 +304,7 @@ namespace Tetris
         {
             get
             {
-                return _shape[(_rotation + 40001) % 4];
+                return _shape[(_rotation + 1) % 4];
             }
         }
 
@@ -312,7 +312,7 @@ namespace Tetris
         {
             get
             {
-                return _shape[(_rotation - 1) % 4];
+                return _shape[(_rotation +3) % 4];
             }
         }
 

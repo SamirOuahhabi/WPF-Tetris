@@ -12,14 +12,24 @@
         <Grid x:Name="grid" Margin="0,0,200,0" />
         <Menu HorizontalAlignment="Left" Height="18" Margin="392,0,0,0" VerticalAlignment="Top" Width="200">
             <MenuItem Header="File">
-                <MenuItem Header="_New" HorizontalAlignment="Left" Width="140" Click="NewMenu_Click"/>
-                <MenuItem Header="_Save" HorizontalAlignment="Left" Width="140" Click="SaveMenu_Click"/>
-                <MenuItem Header="_Load" HorizontalAlignment="Left" Width="140" Click="LoadMenu_Click"/>
+                <MenuItem x:Name="newMenu" Header="_New" HorizontalAlignment="Left" Width="140" Click="NewMenu_Click"/>
+                <MenuItem x:Name="pauseMenu" Header="_Pause" HorizontalAlignment="Left" Width="140" Click="PauseMenu_Click"/>
+                <MenuItem x:Name="resumeMenu" Header="_Resume" HorizontalAlignment="Left" Width="140" Click="ResumeMenu_Click"/>
+                <Separator HorizontalAlignment="Left" Height="1" Width="140"/>
+                <MenuItem x:Name="saveMenu" Header="_Save" HorizontalAlignment="Left" Width="140" Click="SaveMenu_Click"/>
+                <MenuItem x:Name="loadMenu" Header="_Load" HorizontalAlignment="Left" Width="140" Click="LoadMenu_Click"/>
                 <MenuItem Header="E_xit" HorizontalAlignment="Left" Width="140" Click="ExitMenu_Click"/>
             </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="A_bout" HorizontalAlignment="Left" Width="140" Click="AboutMenu_Click"/>
+            </MenuItem>
         </Menu>
-        <Grid x:Name="predictGrid" HorizontalAlignment="Left" Height="150" Margin="418,170,0,0" VerticalAlignment="Top" Width="150"/>
-        <Label x:Name="scoreBoard" Content="Label" HorizontalAlignment="Left" Height="80" Margin="418,85,0,0" VerticalAlignment="Top" Width="150" Background="White"/>
+        <Grid x:Name="predictGrid" HorizontalAlignment="Left" Height="161" Margin="407,206,0,0" VerticalAlignment="Top" Width="161"/>
+        <Label x:Name="scoreBoard" Content="Label" HorizontalAlignment="Left" Height="80" Margin="407,110,0,0" VerticalAlignment="Top" Width="161" Background="White"/>
+        <Label x:Name="nameLabel" Content="Your name:" HorizontalAlignment="Left" Height="26" Margin="407,39,0,0" VerticalAlignment="Top" Width="161" Foreground="White"/>
+        <Button x:Name="change" Content="Change player name" HorizontalAlignment="Left" Height="26" Margin="407,70,0,0" VerticalAlignment="Top" Width="161" Click="change_Click"/>
+        <TextBlock HorizontalAlignment="Left" Height="182" Margin="407,437,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="175" Foreground="White"><Run Text="CTRL+N : start a new Game"/><LineBreak/><Run Text="CTRL+P  : Pause"/><LineBreak/><Run Text="CTRL+G  : Resume"/><LineBreak/><Run Text="CTRL+S   : Save"/><LineBreak/><Run Text="CTRL+O  : load a game"/><LineBreak/><Run Text="CTRL+X   : exit"/><LineBreak/><Run Text="&lt;Home&gt; : go to the next level"/><LineBreak/><Run Text="CTRL+A   : About Tetris"/></TextBlock>
+        <TextBlock x:Name="pausedLabel" HorizontalAlignment="Left" Height="55" Margin="407,377,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="161" Foreground="#FFEE8181" FontSize="24" FontWeight="Bold" FontFamily="Showcard Gothic"><Run Text="Stopped"/><LineBreak/><Run FontWeight="Normal" FontSize="12" Text="CTRL+N To Start a Game"/><LineBreak/><Run/></TextBlock>
 
     </Grid>
 </Window>

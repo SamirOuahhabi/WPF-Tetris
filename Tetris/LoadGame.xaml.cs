@@ -68,5 +68,10 @@ namespace Tetris
             _game.Load(si);
             Close();
         }
+
+        private void ListBoxItem_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

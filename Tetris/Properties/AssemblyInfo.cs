@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("Tetris")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Samir Ouahhabi")]
 [assembly: AssemblyProduct("Tetris")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]

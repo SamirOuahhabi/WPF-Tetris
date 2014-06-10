@@ -240,7 +240,7 @@ namespace Tetris
                 if ((direction.Equals("up", StringComparison.OrdinalIgnoreCase) && 
                     isOccupied((int)(_block.NextRotation[i].Y + _block.Coordinates.Y),
                     (int)(_block.NextRotation[i].X + _block.Coordinates.X)))
-                    && (direction.Equals("down", StringComparison.OrdinalIgnoreCase) &&
+                    || (direction.Equals("down", StringComparison.OrdinalIgnoreCase) &&
                     isOccupied((int)(_block.PreviousRotation[i].Y + _block.Coordinates.Y),
                     (int)(_block.PreviousRotation[i].X + _block.Coordinates.X))))
                 {
